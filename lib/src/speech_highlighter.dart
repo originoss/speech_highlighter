@@ -5,10 +5,15 @@ import 'package:speech_highlighter/speech_highlighter.dart';
 class SpeechHighlighter extends StatefulWidget {
   final String textToSpeak;
   final SpeechConfig config;
+  final HighlightDecoration decoration;
 
   const SpeechHighlighter({
     super.key,
     required this.textToSpeak,
+    this.decoration = const HighlightDecoration(
+      color: Colors.red,
+      borderRadius: Radius.circular(5),
+    ),
     this.config = const SpeechConfig(),
   });
 
@@ -56,7 +61,7 @@ class SpeechHighlighterState extends State<SpeechHighlighter> {
           text: widget.textToSpeak,
           highlightEnd: highlightEnd,
           highlightStart: highlightStart,
-          decoration: const HighlightDecoration(color: Colors.yellow),
+          decoration: widget.decoration,
         ),
       ],
     );
