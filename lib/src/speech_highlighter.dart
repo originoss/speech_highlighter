@@ -5,7 +5,7 @@ import 'package:speech_highlighter/speech_highlighter.dart';
 /// Speech Highlighter allows you to highlight words in a text based
 /// on the current text to speech reader state and progress.
 /// It uses [flutter_tts](https://pub.dev/packages/flutter_tts) to speak
-/// 
+///
 /// ```dart
 /// SpeechHighlighter(
 ///   textToSpeak: 'Hello World',
@@ -16,13 +16,13 @@ import 'package:speech_highlighter/speech_highlighter.dart';
 /// ),
 /// ```
 class SpeechHighlighter extends StatefulWidget {
-  /// Text to be highlighted. 
+  /// Text to be highlighted.
   /// It will be spoken when the text to speak runs.
   final String textToSpeak;
 
   /// Configuration for the text to speech reader
   /// It allows you to set the language, speech rate, volume, and pitch.
-  /// 
+  ///
   /// ```dart
   /// SpeechConfig(
   ///   languageCode: 'en-US',
@@ -34,7 +34,7 @@ class SpeechHighlighter extends StatefulWidget {
   final SpeechConfig config;
 
   /// Decoration for the highlighted text
-  /// 
+  ///
   /// Defaults to [HighlightDecoration]
   /// ```dart
   /// HighlightDecoration(
@@ -44,6 +44,19 @@ class SpeechHighlighter extends StatefulWidget {
   /// ```
   final HighlightDecoration decoration;
 
+  /// Style for the text to be highlighted
+  final TextStyle textStyle;
+
+  /// Duration of the animation when switching between highlights
+  ///
+  /// Defaults to [Duration(milliseconds: 300)]
+  final Duration animationDuration;
+
+  /// Curve of the animation when switching between highlights
+  ///
+  /// Defaults to [Curves.elasticOut]
+  final Curve curve;
+
   const SpeechHighlighter({
     super.key,
     required this.textToSpeak,
@@ -52,6 +65,9 @@ class SpeechHighlighter extends StatefulWidget {
       borderRadius: Radius.circular(5),
     ),
     this.config = const SpeechConfig(),
+    this.textStyle = const TextStyle(fontSize: 16, color: Colors.black),
+    this.animationDuration = const Duration(milliseconds: 300),
+    this.curve = Curves.elasticOut,
   });
 
   @override
@@ -99,6 +115,8 @@ class SpeechHighlighterState extends State<SpeechHighlighter> {
           highlightEnd: highlightEnd,
           highlightStart: highlightStart,
           decoration: widget.decoration,
+          textStyle: widget.textStyle,
+          animationDuration: widget.animationDuration,
         ),
       ],
     );
@@ -108,15 +126,14 @@ class SpeechHighlighterState extends State<SpeechHighlighter> {
   bool _isPaused = false;
 
   /// Starts the text to speech reader
-  /// 
+  ///
   /// ```dart
   /// highlighterKey.currentState?.speakText();
   /// ```
   void speakText() => _flutterTts.speak(widget.textToSpeak);
 
-
   /// Pauses the text to speech reader
-  /// 
+  ///
   /// ```dart
   /// highlighterKey.currentState?.pause();
   /// ```
@@ -127,7 +144,7 @@ class SpeechHighlighterState extends State<SpeechHighlighter> {
   }
 
   /// Stops the text to speech reader
-  /// 
+  ///
   /// ```dart
   /// highlighterKey.currentState?.stop();
   /// ```
@@ -137,7 +154,7 @@ class SpeechHighlighterState extends State<SpeechHighlighter> {
   }
 
   /// Stops the text to speech reader
-  /// 
+  ///
   /// ```dart
   /// highlighterKey.currentState?.stop();
   /// ```

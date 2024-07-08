@@ -42,12 +42,18 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: [
-          SpeechHighlighter(
-            key: highlighterKey,
-            textToSpeak: ttsInput,
-            decoration: const HighlightDecoration(
-              color: Colors.red,
-              borderRadius: Radius.circular(5),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SpeechHighlighter(
+              key: highlighterKey,
+              textToSpeak: ttsInput,
+              decoration: HighlightDecoration(
+                color: Colors.redAccent.withOpacity(.5),
+                borderRadius: const Radius.circular(5),
+                padding: const EdgeInsets.all(2),
+              ),
+              textStyle: const TextStyle(fontSize: 16, color: Colors.red),
+              animationDuration: const Duration(milliseconds: 300),
             ),
           ),
           const SizedBox(height: 20),

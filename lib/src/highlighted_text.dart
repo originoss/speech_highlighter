@@ -7,6 +7,7 @@ class HighlightedText extends StatefulWidget {
   final int highlightEnd;
   final TextStyle textStyle;
   final Duration animationDuration;
+  final Curve curve;
   final HighlightDecoration decoration;
 
   const HighlightedText({
@@ -17,6 +18,7 @@ class HighlightedText extends StatefulWidget {
     this.decoration = const HighlightDecoration(color: Colors.yellow),
     this.textStyle = const TextStyle(fontSize: 16, color: Colors.black),
     this.animationDuration = const Duration(milliseconds: 300),
+    this.curve = Curves.elasticOut,
   });
 
   @override
@@ -25,6 +27,7 @@ class HighlightedText extends StatefulWidget {
 
 class _HighlightedTextState extends State<HighlightedText> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late CurvedAnimation _curvedAnimation;
   late Animation<int> _startAnimation;
   late Animation<int> _endAnimation;
 
@@ -32,6 +35,8 @@ class _HighlightedTextState extends State<HighlightedText> with SingleTickerProv
   void initState() {
     super.initState();
     _controller = AnimationController(duration: widget.animationDuration, vsync: this);
+
+    _curvedAnimation = CurvedAnimation(parent: _controller, curve: widget.curve);
     _startAnimation = IntTween(begin: widget.highlightStart, end: widget.highlightStart).animate(_controller);
     _endAnimation = IntTween(begin: widget.highlightEnd, end: widget.highlightEnd).animate(_controller);
   }
@@ -52,7 +57,9 @@ class _HighlightedTextState extends State<HighlightedText> with SingleTickerProv
 
   @override
   void dispose() {
+    _curvedAnimation.dispose();
     _controller.dispose();
+
     super.dispose();
   }
 
@@ -60,24 +67,28 @@ class _HighlightedTextState extends State<HighlightedText> with SingleTickerProv
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final textPainter = TextPainter(
+          text: TextSpan(text: widget.text, style: widget.textStyle),
+          textDirection: TextDirection.ltr,
+          maxLines: null,
+        );
+
+        textPainter.layout(maxWidth: constraints.biggest.width);
+        
         return SizedBox(
           width: constraints.maxWidth,
           child: AnimatedBuilder(
-            animation: _controller,
+            animation: _curvedAnimation,
             builder: (context, child) {
               return CustomPaint(
+                size: Size(textPainter.width, textPainter.height),
                 painter: _HighlightPainter(
                   text: widget.text,
                   textStyle: widget.textStyle,
                   decoration: widget.decoration,
                   highlightStart: _startAnimation.value,
                   highlightEnd: _endAnimation.value,
-                ),
-                child: Text(
-                  widget.text,
-                  style: const TextStyle(
-                    color: Colors.transparent,
-                  ), // Workaround to avoid double text rendering. Should fix this
+                  textPainter: textPainter,
                 ),
               );
             },
@@ -94,6 +105,7 @@ class _HighlightPainter extends CustomPainter {
   final HighlightDecoration decoration;
   final int highlightStart;
   final int highlightEnd;
+  final TextPainter textPainter;
 
   _HighlightPainter({
     required this.text,
@@ -101,17 +113,11 @@ class _HighlightPainter extends CustomPainter {
     required this.decoration,
     required this.highlightStart,
     required this.highlightEnd,
+    required this.textPainter,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final textPainter = TextPainter(
-      text: TextSpan(text: text, style: textStyle),
-      textDirection: TextDirection.ltr,
-      maxLines: null,
-    );
-    textPainter.layout(maxWidth: size.width);
-
     final paint = Paint()..color = decoration.color;
 
     final List<TextBox> boxes = textPainter.getBoxesForSelection(
@@ -120,11 +126,11 @@ class _HighlightPainter extends CustomPainter {
 
     for (final box in boxes) {
       final highlightRect = Rect.fromLTRB(
-        box.left,
-        box.top,
-        box.right,
-        box.bottom,
-      ).inflate(2);
+        box.left - decoration.padding.left,
+        box.top - decoration.padding.top,
+        box.right + decoration.padding.right,
+        box.bottom + decoration.padding.bottom,
+      ).inflate(1);
 
       canvas.drawRRect(
         RRect.fromRectAndRadius(highlightRect, decoration.borderRadius),
