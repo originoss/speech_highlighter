@@ -1,59 +1,62 @@
 # Speech Highlighter
 
+ ⚠️ This package is still under development. Do not use it for production
 ![demo](./demo.gif)
 
-TODO: Write docs
+## How to use
 
-### Usage
+1. Install the package (coming soon)
+
+```bash
+  flutter pub add speech_highlighter
+```
+
+2. Import the package
 
 ```dart
-final GlobalKey<SpeechHighlighterState> highlighterKey = GlobalKey<SpeechHighlighterState>();
-final ttsInput = 'This is a test text to be highlighted. We are making it long so that it will wrap.';
- @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Column(
-        children: [
-          SpeechHighlighter(
-            key: highlighterKey,
-            textToSpeak: ttsInput,
-            decoration: const HighlightDecoration(
-              color: Colors.red,
-              borderRadius: Radius.circular(5),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Wrap(
-            spacing: 10,
-            children: [
-              ElevatedButton(
-                onPressed: speakText,
-                child: const Text('Speak Text'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  highlighterKey.currentState?.pause();
-                },
-                child: const Text('Pause'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  highlighterKey.currentState?.stop();
-                },
-                child: const Text('Stop'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void speakText() {
-    highlighterKey.currentState?.speakText();
-  }
+import 'package:speech_highlighter/speech_highlighter.dart';
 ```
+
+3. Use it
+
+```dart
+SpeechHighlighter(
+  key: highlighterKey,
+  textToSpeak: ttsInput,
+  decoration: const HighlightDecoration(
+    color: Colors.red,
+    borderRadius: Radius.circular(5),
+  ),
+)
+```
+
+## Interaction with the Text-to-Speech engine
+
+1. Declare a global key for the [SpeechHighlighter] widget
+
+```dart
+final highlighterKey = GlobalKey<SpeechHighlighterState>();
+```
+
+2. Pass the key to the [SpeechHighlighter] widget
+
+```dart
+SpeechHighlighter(
+  key: highlighterKey,
+  textToSpeak: ttsInput,
+  decoration: const HighlightDecoration(
+    color: Colors.red,
+    borderRadius: Radius.circular(5),
+  ),
+)
+```
+
+3. Call methods on the [SpeechHighlighter] widget
+
+```dart
+// Example: speak text
+highlighterKey.currentState?.speakText();
+```
+
+## Contributing
+Feel free to open an issue or PR if you have any questions or suggestions.

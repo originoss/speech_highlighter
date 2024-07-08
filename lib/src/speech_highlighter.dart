@@ -2,9 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_highlighter/speech_highlighter.dart';
 
+/// Speech Highlighter allows you to highlight words in a text based
+/// on the current text to speech reader state and progress.
+/// It uses [flutter_tts](https://pub.dev/packages/flutter_tts) to speak
+/// 
+/// ```dart
+/// SpeechHighlighter(
+///   textToSpeak: 'Hello World',
+///   decoration: HighlightDecoration(
+///     color: Colors.red,
+///     borderRadius: Radius.circular(5),
+///   ),
+/// ),
+/// ```
 class SpeechHighlighter extends StatefulWidget {
+  /// Text to be highlighted. 
+  /// It will be spoken when the text to speak runs.
   final String textToSpeak;
+
+  /// Configuration for the text to speech reader
+  /// It allows you to set the language, speech rate, volume, and pitch.
+  /// 
+  /// ```dart
+  /// SpeechConfig(
+  ///   languageCode: 'en-US',
+  ///   speechRate: 1.0,
+  ///   volume: 1.0,
+  ///   pitch: 1.0,
+  /// )
+  /// ```
   final SpeechConfig config;
+
+  /// Decoration for the highlighted text
+  /// 
+  /// Defaults to [HighlightDecoration]
+  /// ```dart
+  /// HighlightDecoration(
+  ///   color: Colors.red,
+  ///   borderRadius: Radius.circular(5),
+  /// )
+  /// ```
   final HighlightDecoration decoration;
 
   const SpeechHighlighter({
@@ -22,7 +59,7 @@ class SpeechHighlighter extends StatefulWidget {
 }
 
 class SpeechHighlighterState extends State<SpeechHighlighter> {
-  FlutterTts flutterTts = FlutterTts();
+  final FlutterTts _flutterTts = FlutterTts();
 
   int highlightStart = 0;
   int highlightEnd = 0;
@@ -34,12 +71,12 @@ class SpeechHighlighterState extends State<SpeechHighlighter> {
   }
 
   void _initTTS() async {
-    flutterTts.setLanguage("en-US");
-    flutterTts.setSpeechRate(widget.config.speechRate);
-    flutterTts.setVolume(widget.config.volume);
-    flutterTts.setPitch(widget.config.pitch);
+    _flutterTts.setLanguage(widget.config.languageCode);
+    _flutterTts.setSpeechRate(widget.config.speechRate);
+    _flutterTts.setVolume(widget.config.volume);
+    _flutterTts.setPitch(widget.config.pitch);
 
-    flutterTts.setProgressHandler((String text, int start, int end, String word) {
+    _flutterTts.setProgressHandler((String text, int start, int end, String word) {
       setState(() {
         highlightStart = start;
         highlightEnd = end;
@@ -49,7 +86,7 @@ class SpeechHighlighterState extends State<SpeechHighlighter> {
 
   @override
   void dispose() {
-    flutterTts.stop();
+    _flutterTts.stop();
     super.dispose();
   }
 
@@ -70,18 +107,39 @@ class SpeechHighlighterState extends State<SpeechHighlighter> {
   bool get isPaused => _isPaused;
   bool _isPaused = false;
 
-  void speakText() => flutterTts.speak(widget.textToSpeak);
+  /// Starts the text to speech reader
+  /// 
+  /// ```dart
+  /// highlighterKey.currentState?.speakText();
+  /// ```
+  void speakText() => _flutterTts.speak(widget.textToSpeak);
 
+
+  /// Pauses the text to speech reader
+  /// 
+  /// ```dart
+  /// highlighterKey.currentState?.pause();
+  /// ```
   void resume() {
     // TODO: Implement resume
     speakText();
     _isPaused = false;
   }
 
+  /// Stops the text to speech reader
+  /// 
+  /// ```dart
+  /// highlighterKey.currentState?.stop();
+  /// ```
   void pause() {
-    flutterTts.pause();
+    _flutterTts.pause();
     _isPaused = true;
   }
 
-  void stop() => flutterTts.stop();
+  /// Stops the text to speech reader
+  /// 
+  /// ```dart
+  /// highlighterKey.currentState?.stop();
+  /// ```
+  void stop() => _flutterTts.stop();
 }

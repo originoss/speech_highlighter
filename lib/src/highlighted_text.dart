@@ -74,8 +74,10 @@ class _HighlightedTextState extends State<HighlightedText> with SingleTickerProv
                   highlightEnd: _endAnimation.value,
                 ),
                 child: Text(
-                  widget.text, 
-                  style: const TextStyle(color: Colors.transparent), // Workaround to avoid double text rendering. Should fix this
+                  widget.text,
+                  style: const TextStyle(
+                    color: Colors.transparent,
+                  ), // Workaround to avoid double text rendering. Should fix this
                 ),
               );
             },
@@ -112,7 +114,6 @@ class _HighlightPainter extends CustomPainter {
 
     final paint = Paint()..color = decoration.color;
 
-    // Draw the highlight
     final List<TextBox> boxes = textPainter.getBoxesForSelection(
       TextSelection(baseOffset: highlightStart, extentOffset: highlightEnd),
     );
@@ -131,7 +132,6 @@ class _HighlightPainter extends CustomPainter {
       );
     }
 
-    // Draw the text
     textPainter.paint(canvas, Offset.zero);
   }
 
